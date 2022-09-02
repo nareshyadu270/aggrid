@@ -6,10 +6,13 @@ import { Modal } from "react-responsive-modal";
 import "react-responsive-modal/styles.css";
 import Form from "react-bootstrap/Form";
 import "./../index.css";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
+import { FaTrashAlt, FaEdit, FaGripVertical } from "react-icons/fa";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-import PopupCellRenderer from './../'
+import PopupCellRenderer from "./../";
 
 class Services extends Component {
   constructor(props) {
@@ -26,36 +29,40 @@ class Services extends Component {
       openModal: false,
       columnDefs: [
         { field: "slNo", headerName: "SlNo", filter: true },
-        { field: "fullName", headerName: "Full Name", },
-        { field: "username", headerName: "Username", tooltipField:"name"},
+        { field: "fullName", headerName: "Full Name" },
+        { field: "username", headerName: "Username", tooltipField: "name" },
         { field: "email", headerName: "Email", filter: true },
-        { field: "phone", headerName: "Phone", filter: true, cellEditorParams: {
-          cellEditor: 'agRichSelectCellEditor',
-          values: ['a','b','c'],}
-      
-      },
         {
-          field: "slNo",
-          headerName: "Actions",
-          cellRendererFramework: (params) => (
-            <div>
-              <button variant="outlined" color="primary" onClick={()=>this.handleUpadte(params.data)}>
-                Update
-              </button>
-              <button
-                variant="outlined"
-                color="secondary"
-                onClick={() => this.handleDelete(params.value)}
-              >
-                Delete
-              </button>
-            </div>
-          ),
+          field: "phone",
+          headerName: "Phone",
+          filter: true,
+          cellEditorParams: {
+            cellEditor: "agRichSelectCellEditor",
+            values: ["a", "b", "c"],
+          },
         },
         {
           field: "slNo",
           headerName: "Actions",
-          cellRendererFramework:(params)=>this.actionFunction(params)
+          // cellRendererFramework: (params) => (
+          //   <div>
+          //     <button variant="outlined" color="primary" onClick={()=>this.handleUpadte(params.data)}>
+          //       Update
+          //     </button>
+          //     <button
+          //       variant="outlined"
+          //       color="secondary"
+          //       onClick={() => this.handleDelete(params.value)}
+          //     >
+          //       Delete
+          //     </button>
+          //   </div>
+          // ),
+        },
+        {
+          field: "slNo",
+          headerName: "Actions",
+          cellRendererFramework: (params) => this.actionFunction(params),
           // (
           //   <div>
           //     <button variant="outlined" color="primary" onClick={()=>this.handlewindow(params.data)}>
@@ -63,7 +70,7 @@ class Services extends Component {
           //     </button>
           //     {
           //       console.log(params)
-          //       // params.data.isPopup && 
+          //       // params.data.isPopup &&
           //       // <div>
           //       //   Naresh
           //       // </div>
@@ -71,8 +78,6 @@ class Services extends Component {
           //   </div>
           // ),
         },
-        
-       
       ],
     };
   }
@@ -82,10 +87,11 @@ class Services extends Component {
   }
   onClickButton = (e) => {
     console.log("Open");
-    
+
     this.setState({ openModal: true });
   };
   handleDelete = (id) => {
+    console.log(id)
     const confirm = window.confirm("Are you sure, you want to delete this row");
     if (confirm) {
       axios
@@ -106,43 +112,72 @@ class Services extends Component {
         });
     }
   };
-  handleUpadte =(oldData)=>{
-    console.log(oldData)
-    this.setState({newUserData:oldData})
-    this.onClickButton()
-  }
-  actionFunction = (params)=>(
-      <div>
-        {
-          
-          params.data.isPopup && 
-          <div id="popup1" class="overlay">
-	<div class="popup">
-		<h2>Here i am</h2>
-		<a class="close" href="#">&times;</a>
-		<div class="content">
-			Thank to pop me out of that button, but now i'm done so you can close this window.
-		</div>
-	</div>
-</div>
+  handleUpadte = (oldData) => {
+    console.log(oldData);
+    this.setState({ newUserData: oldData });
+    this.onClickButton();
+  };
+  actionFunction = (params) => (
+    //       <div>
+    //         {
+
+    //           params.data.isPopup &&
+    //           <div id="popup1" class="overlay">
+    // 	<div class="popup">
+    // 		<h2>Here i am</h2>
+    // 		<a class="close" href="#">&times;</a>
+    // 		<div class="content">
+    // 			Thank to pop me out of that button, but now i'm done so you can close this window.
+    // 		</div>
+    // 	</div>
+    // </div>
+    //         }
+    //         <button to="#popup1" variant="outlined" color="primary" onClick={()=>this.handlewindow(params.data)}>
+    //           window{params.data.slNo}
+    //         </button>
+
+    //       </div>
+    <div>
+      <Popup
+        trigger={
+          <a>
+            {" "}
+            <FaGripVertical />{" "}
+          </a>
         }
-        <button to="#popup1" variant="outlined" color="primary" onClick={()=>this.handlewindow(params.data)}>
-          window{params.data.slNo}
-        </button>
-        
-      </div>
-    )
-  handlewindow = (params)=>{
-    console.log(params)
-    const value = [...this.state.workviewData]
-    const id = value.findIndex((item)=>item.slNo===params.slNo)
-    value.splice(id,1)
-    const obj = {
-      ...params, 
-      isPopup:true
-    }
-    this.setState({workviewData:[obj,...value]})
-  }
+        position="left center"
+      >
+        <div>
+          {" "}
+          <button
+            variant="outlined"
+            color="secondary"
+            onClick={() => this.handleDelete(params.data.id)}
+          >
+            <FaTrashAlt />
+          </button>
+          <button
+            variant="outlined"
+            color="primary"
+            onClick={() => this.handleUpadte(params.data)}
+          >
+            <FaEdit />
+          </button>
+        </div>
+      </Popup>
+    </div>
+  );
+  // handlewindow = (params) => {
+  //   console.log(params);
+  //   const value = [...this.state.workviewData];
+  //   const id = value.findIndex((item) => item.slNo === params.slNo);
+  //   value.splice(id, 1);
+  //   const obj = {
+  //     ...params,
+  //     isPopup: true,
+  //   };
+  //   this.setState({ workviewData: [obj, ...value] });
+  // };
   onCloseModal = () => {
     this.setState({ openModal: false });
     this.setState({ newUserData: "" });
@@ -152,7 +187,10 @@ class Services extends Component {
       .get("http://localhost:3000/users")
       .then((data) => {
         if (data.status === 200 && data.data.length > 0) {
-          const weData = data.data.map((item,index)=>({...item,slNo:index+1}))
+          const weData = data.data.map((item, index) => ({
+            ...item,
+            slNo: index + 1,
+          }));
           this.setState({
             workviewData: weData,
           });
@@ -242,7 +280,7 @@ class Services extends Component {
         <button onClick={this.onClickButton}>Add User</button>
 
         <Modal open={this.state.openModal} onClose={this.onCloseModal}>
-          <h2 className="mb-5">{this.id?"Update User":"Create User"}</h2>
+          <h2 className="mb-5">{this.id ? "Update User" : "Create User"}</h2>
           <form onSubmit={this.onSubmit}>
             <div className="form-group form-row">
               <label className="col-lg-4">Full Name</label>
